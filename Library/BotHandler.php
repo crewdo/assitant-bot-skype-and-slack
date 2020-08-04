@@ -21,7 +21,7 @@ class BotHandler
     private function completeMessage()
     {
         $tranlatedMessage = $this->translator->translate($this->message);
-        return $this->message . ' : ' . $tranlatedMessage;
+        return $tranlatedMessage . "\n" . "(" .$this->message .")" ;
     }
 
     public function send()
