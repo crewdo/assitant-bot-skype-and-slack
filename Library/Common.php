@@ -3,18 +3,12 @@ namespace Library;
 
 class Common
 {
-    public function formatResponse($message, $response)
+    public function formatResponse($message, $code)
     {
-        if (!empty($response)) {
-            header('Content-type: application/json');
-            return json_encode([
-                'status' => 200,
-                'message' => $message. ' : ' .$response
-            ], JSON_UNESCAPED_UNICODE);
-        }
+        header('Content-type: application/json');
         return json_encode([
-            'status' => 500,
-            'message' => 'Can not get any Response'
-        ]);
+            'status' => 'success',
+            'code' => $code
+        ], JSON_UNESCAPED_UNICODE);
     }
 }
