@@ -1,25 +1,61 @@
 <?php
 
 namespace Library;
+include_once('Library/TokenStore.php');
 
 final class SkypeAuth
 {
     const BASE_API = 'https://apis.skype.com';
     const BASE_AUTH_URL = 'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token';
 
+    //This one never change
+    const CREW_BOT_CLIENT_ID = '8f70ea30-fdb1-4445-925d-bca7a4204a2c';
+    const CREW_BOT_CLIENT_SECRET = '&b||#:n68l*4eis;c=Yi&)%j';
+
+    public $tokenStore;
+    public $groupIdentifier;
+    public $commonService;
+
     public function __construct($groupIdentifier)
     {
         $this->groupIdentifier = $groupIdentifier;
+        $this->commonService = new CommonService();
+        $this->tokenStore = new TokenStore();
+    }
+
+
+    public function auth()
+    {
+        $rs = $this->commonService->request(self::BASE_AUTH_URL,
+            [
+            'client_id' => self::CREW_BOT_CLIENT_ID,
+            'client_secret' => self::CREW_BOT_CLIENT_SECRET,
+            'grant_type' => 'client_credentials',
+            'scope' => 'https://api.botframework.com/.default'
+             ]);
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $rs['expires_in'] = $now->getTimestamp() + $rs['expires_in'];
+
+        $this->tokenStore->store($rs);
+
+        return $rs;
     }
 
     public function getAccessToken()
     {
-        //checking
-        return 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Imh1Tjk1SXZQZmVocTM0R3pCRFoxR1hHaXJuTSIsImtpZCI6Imh1Tjk1SXZQZmVocTM0R3pCRFoxR1hHaXJuTSJ9.eyJhdWQiOiJodHRwczovL2FwaS5ib3RmcmFtZXdvcmsuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvZDZkNDk0MjAtZjM5Yi00ZGY3LWExZGMtZDU5YTkzNTg3MWRiLyIsImlhdCI6MTU5NjUyNjA2MiwibmJmIjoxNTk2NTI2MDYyLCJleHAiOjE1OTY2MTI3NjIsImFpbyI6IkUyQmdZTmlUZFhWTlJZbFQ2a1d6R1F4K0I5enVBZ0E9IiwiYXBwaWQiOiI4ZjcwZWEzMC1mZGIxLTQ0NDUtOTI1ZC1iY2E3YTQyMDRhMmMiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9kNmQ0OTQyMC1mMzliLTRkZjctYTFkYy1kNTlhOTM1ODcxZGIvIiwidGlkIjoiZDZkNDk0MjAtZjM5Yi00ZGY3LWExZGMtZDU5YTkzNTg3MWRiIiwidXRpIjoiNU51Z21IelJ0RWFuNmluanBMQVRBQSIsInZlciI6IjEuMCJ9.rFBeoygJHRzHFXYy7OrFkssCd56MINhZwq-bBh5dT7vglPKmEhU3LPoHGfTq9BvqdGbbDbdJNkStzSY70fdmqcmuzmVcPi9XPRNl4xhbw5xogkKkI6HCKv3KZ_x-bfWrE0HbTsUA2KZtQHCxmb6shUXfR1hFZiXoe7YTdS_9cKe1WpYCiQzxXVGLipFSSGtpXPbqawGJfDhibXj3S9yiDhVQSKExnzL5GSzXIWwrDaizjV-FGeK5i9TbiJUBnMhQUfUbDn4dpInEr1hZOgdAHJC7WFBzHXOm5p6l8WgaeYKjeGTqSIljjnyQF8zCx8-QztWWFWWKjPOAvwmKqbRv3Q';
+        $tokenData = $this->tokenStore->getAll();
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        if (empty($tokenData['expires_in']) || $tokenData['expires_in'] < ($now->getTimestamp() + 600)) {
+            $tokenData = $this->auth();
+        }
+        return $tokenData['access_token'];
     }
 
-    private function getConversationURI() {
-        return self::BASE_API. '/v3/conversations/'. $this->groupIdentifier. '/activities';
+    private function getConversationURI()
+    {
+        return self::BASE_API . '/v3/conversations/' . $this->groupIdentifier . '/activities';
     }
 
     public function send($message)
@@ -28,7 +64,6 @@ final class SkypeAuth
             'type' => 'message/text',
             'text' => $message
         ];
-
-        return (new Common())->requestJWT($this->getAccessToken(), $this->getConversationURI(), $postData);
+        return $this->commonService->request($this->getConversationURI(), $postData, $this->getAccessToken());
     }
 }

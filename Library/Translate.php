@@ -1,4 +1,5 @@
 <?php
+
 namespace Library;
 
 class Translate
@@ -27,7 +28,7 @@ class Translate
             'q' => urlencode($text)
         );
 
-        if(strlen($fields['q'])>=5000)
+        if (strlen($fields['q']) >= 5000)
             throw new \Exception("Maximum number of characters exceeded: 5000");
 
         // URL-ify the data for the POST
@@ -64,7 +65,7 @@ class Translate
         $sentencesArray = json_decode($json, true);
         $sentences = "";
 
-        if(!$sentencesArray)
+        if (!$sentencesArray)
             throw new \Exception("Google detected unusual traffic from your computer network, try again later (2 - 48 hours)");
 
         foreach ($sentencesArray["sentences"] as $s) {
