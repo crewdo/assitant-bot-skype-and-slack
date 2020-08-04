@@ -1,7 +1,10 @@
 <?php
+
 namespace Library;
 
 include_once('Library/Translate.php');
+include_once('Library/SkypeAuth.php');
+
 class BotHandler
 {
     public $groupIdentifier;
@@ -11,26 +14,18 @@ class BotHandler
     public function __construct(Translate $translator, $message, $groupIdentifier)
     {
         $this->message = $message;
-        $this->groupIdentifier = $groupIdentifier;
         $this->translator = $translator;
+        $this->skypeAuth = new SkypeAuth($groupIdentifier);
     }
 
-    protected static function getAuthenticate()
+    private function completeMessage()
     {
-
-    }
-
-    private function completeMessage() {
         $tranlatedMessage = $this->translator->translate($this->message);
         return $this->message . ' : ' . $tranlatedMessage;
     }
 
-    public function send() {
-        $sendData = [
-            'type' => 'message/text',
-            'text' => $this->completeMessage()
-        ];
-
-        //call API
+    public function send()
+    {
+        return $this->skypeAuth->send($this->completeMessage());
     }
 }
