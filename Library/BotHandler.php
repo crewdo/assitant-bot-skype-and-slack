@@ -20,12 +20,19 @@ class BotHandler
 
     private function completeMessage()
     {
+        $this->freshingMessage();
+        if(!$this->message) return null;
         $tranlatedMessage = $this->translator->translate($this->message);
-        return $tranlatedMessage . "\n" . "(" .$this->message .")" ;
+        return $tranlatedMessage . "\n" .$this->message ;
+    }
+
+    private function freshingMessage(){
+        $this->message = trim(preg_replace('/\s+/', ' ', $this->message));
     }
 
     public function send()
     {
-        return $this->skypeAuth->send($this->completeMessage());
+        $messageToSend = $this->completeMessage();
+        return $messageToSend && $this->skypeAuth->send($messageToSend);
     }
 }
