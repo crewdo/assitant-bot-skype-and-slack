@@ -23,7 +23,7 @@ class BotHandler
         $this->freshingMessage();
         if(!$this->message) return null;
         $tranlatedMessage = $this->translator->translate($this->message);
-        return $tranlatedMessage . "\n" .$this->message ;
+        return ucfirst($tranlatedMessage) . "\n" ."(star) ".$this->message ;
     }
 
     private function freshingMessage(){
