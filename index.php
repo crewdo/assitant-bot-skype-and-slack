@@ -8,8 +8,8 @@ include_once('Library/BotHandler.php');
 
 $commomLib = new \Library\CommonService();
 
-if (!empty($_POST['message']) && !empty($_POST['group_identifier'])) {
+if (!empty($_POST['message']) && !empty($_POST['service_connector'])) {
     $translator = new \Library\Translate();
-    $botHandler = new \Library\BotHandler($translator, $_POST['message'], $_POST['group_identifier']);
+    $botHandler = new \Library\BotHandler($translator, $_POST['message'], !empty($_POST['translate_status']), $_POST['service_connector'] == 'skype' ? 'skype' : 'slack');
     echo $commomLib->formatResponse($botHandler->send(), 200);
 }

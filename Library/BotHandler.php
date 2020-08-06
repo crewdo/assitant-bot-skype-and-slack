@@ -3,27 +3,39 @@
 namespace Library;
 
 include_once('Library/Translate.php');
+include_once('Library/ConnectorInterface.php');
+include_once('Library/Connector.php');
 include_once('Library/SkypeAuth.php');
+include_once('Library/SlackAuth.php');
 
 class BotHandler
 {
     public $groupIdentifier;
     public $message;
     public $translator;
+    public $connectorType;
+    public $serviceConnector;
+    public $isTranslate;
 
-    public function __construct(Translate $translator, $message, $groupIdentifier)
+    public function __construct(Translate $translator, $message, $isTranslate, $connectorType = 'skype')
     {
         $this->message = $message;
         $this->translator = $translator;
-        $this->skypeAuth = new SkypeAuth($groupIdentifier);
-    }
+        $this->isTranslate = $isTranslate;
+        $this->connectorType = $connectorType;
 
-    private function completeMessage()
+        $this->serviceConnector = $this->chooseServiceConnector();
+    }
+    public function completeMessage()
     {
         $this->freshingMessage();
         if(!$this->message) return null;
-        $tranlatedMessage = $this->translator->translate($this->message);
-        return ucfirst($tranlatedMessage) . "\n" ."(star) ".$this->message ;
+
+        $translatedMessage = $this->isTranslate ?  $this->translator->translate($this->message) : null;
+        if($translatedMessage) {
+            return ucfirst($translatedMessage) . "\n" ."{{icon}} ".$this->message ;
+        }
+        return "{{icon}} ".$this->message;
     }
 
     private function freshingMessage(){
@@ -33,6 +45,11 @@ class BotHandler
     public function send()
     {
         $messageToSend = $this->completeMessage();
-        return $messageToSend && $this->skypeAuth->send($messageToSend);
+        return $messageToSend ? $this->serviceConnector->send($messageToSend) : "Failed";
+    }
+
+    function chooseServiceConnector() {
+        //later can switch case
+        return $this->connectorType == 'skype' ? new SkypeAuth() : new SlackAuth();
     }
 }
