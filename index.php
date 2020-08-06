@@ -10,6 +10,6 @@ $commomLib = new \Library\CommonService();
 
 if (!empty($_POST['message']) && !empty($_POST['service_connector'])) {
     $translator = new \Library\Translate();
-    $botHandler = new \Library\BotHandler($translator, $_POST['message'], !empty($_POST['translate_status']), $_POST['service_connector'] == 'skype' ? 'skype' : 'slack');
+    $botHandler = new \Library\BotHandler($translator, $_POST['message'], $_POST['service_connector'] == 'skype' ? 'skype' : 'slack');
     echo $commomLib->formatResponse($botHandler->send(), 200);
 }

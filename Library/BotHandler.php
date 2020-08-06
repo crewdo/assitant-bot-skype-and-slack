@@ -17,11 +17,11 @@ class BotHandler
     public $serviceConnector;
     public $isTranslate;
 
-    public function __construct(Translate $translator, $message, $isTranslate, $connectorType = 'skype')
+    public function __construct(Translate $translator, $message, $connectorType = 'skype')
     {
         $this->message = $message;
         $this->translator = $translator;
-        $this->isTranslate = $isTranslate;
+        $this->isTranslate = $_POST['translate_status'] === "true";
         $this->connectorType = $connectorType;
 
         $this->serviceConnector = $this->chooseServiceConnector();
