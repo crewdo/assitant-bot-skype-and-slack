@@ -9,7 +9,8 @@ final class SlackAuth extends \Connector implements \ConnectorInterface
     public $userId;
     public $hookURL;
     public $commonService;
-    protected $icon = ':star:';
+//    protected $icon = ':star:';
+    protected $icon = '';
 
     public function __construct()
     {

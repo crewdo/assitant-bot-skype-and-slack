@@ -18,7 +18,8 @@ final class SkypeAuth extends \Connector implements \ConnectorInterface
     public $tokenStore;
     public $groupIdentifier;
     public $commonService;
-    protected $icon = '(star)';
+//    protected $icon = '(star)';
+    protected $icon = '';
 
     public function __construct()
     {
