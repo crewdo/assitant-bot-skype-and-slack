@@ -12,8 +12,8 @@ final class SkypeAuth extends \Connector implements \ConnectorInterface
     const BASE_AUTH_URL = 'https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token';
 
     //This one never change
-    const CREW_BOT_CLIENT_ID = '8f70ea30-fdb1-4445-925d-bca7a4204a2c';
-    const CREW_BOT_CLIENT_SECRET = '&b||#:n68l*4eis;c=Yi&)%j';
+    const CREW_BOT_CLIENT_ID = 'your_bot_client_id';
+    const CREW_BOT_CLIENT_SECRET = 'your_secret';
 
     public $tokenStore;
     public $groupIdentifier;
